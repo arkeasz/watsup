@@ -1,0 +1,53 @@
+.chat {
+    display: grid;
+    grid-template-areas:
+    "header header header"
+    "room messages messages"
+    ;
+    background-color: #f5f5f5;
+    width: 100vw;
+    height: 100vh;
+    grid-template-rows: 10vh 90vh;
+    grid-template-columns: 30vw 70vw;
+}
+
+header {
+    grid-area: header;
+    background-color: #333;
+    color: white;
+    width: 100%;
+}
+
+.rooms {
+    grid-area: room;
+    background-color: #a5a5a5;
+    width: 100%;
+}
+
+.chatbox {
+    grid-area: messages;
+    background-color: #350101;
+    display: flex;
+    width: 100%;
+    flex-direction: column-reverse;
+}
+
+.rooms_all {
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    gap: 2rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.room {
+    background-color: #222;
+    width: calc(100% - 2rem);
+    padding: 1rem ;
+}
+
+.room__hidden {
+    /* display: none; */
+    visibility: hidden;
+}

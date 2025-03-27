@@ -4,4 +4,3 @@ create table rooms (
   name text not null unique,
   created_at timestamp with time zone default now()
 );
-
