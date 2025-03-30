@@ -2,27 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import './Chat.css';
 import socket from './socket'
-type Room = {
-    id: number;
-    name: string;
-}
-
-type Message = {
-    content: string;
-    user_id: number;
-    room_id?: number;
-}
-type AddedToRoomEvent = {
-    room_id: number;
-    room_name: string;
-};
-type UserJoinedEvent = {
-    user_id: number;
-    username: string;
-    room_id: number;
-    room_name: string;
-};
-
+import { UserJoinedEvent, AddedToRoomEvent, Room, Message } from './types'
+import Rooms from "./components/Rooms";
 function Chat() {
     const navigate = useNavigate();
     const [roomsAll, setRoomsAll] = useState<Room[]>([]);
@@ -66,9 +47,9 @@ function Chat() {
             );
         };
 
-        // if (id) {
-        //     socket.emit('registerUser', id);
-        // }
+        if (id) {
+            socket.emit('registerUser', id);
+        }
 
         const handleAddedToRoom = ({ room_id, room_name }: AddedToRoomEvent) => {
             setRoomsAll(prevRooms => {
@@ -218,22 +199,11 @@ function Chat() {
             <header>
                 <button onClick={logOut}>Salir</button>
             </header>
-            <div className="rooms">
-                <div className="rooms__settings">
-                    <form onSubmit={createRoom}>
-                        <input type="text" placeholder="room" />
-                        <button type="submit">Add</button>
-                    </form>
-                </div>
-                <div className="rooms_all">
-                    <section className="room room__hidden">wazaaaa</section>
-                    {roomsAll.map(r => (
-                        <section onClick={() => onRoom(r)} data-peer-id={r.id} key={r.id} className="room">
-                            {r.name}
-                        </section>
-                    ))}
-                </div>
-            </div>
+            <Rooms
+                createRoom={createRoom}
+                roomsAll={roomsAll}
+                onRoom={onRoom}
+            />
             <div className="chatbox">
                 <div className="chatbox__info" onClick={openSettings}>
                     { room?.name }
