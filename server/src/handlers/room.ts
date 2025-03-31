@@ -108,4 +108,40 @@ const getRoomByUser = async (req: Request, res: Response): Promise<any> => {
     }
 }
 
-export { addMemberToRoom, postRoom, getRoomByUser }
+const deleteRoom = async (req: Request, res: Response): Promise<any> => {
+    /**
+     * firs step: delete the room
+     * DELETE FROM room_members WHERE room_id = room_id
+     * second step: delte room_members
+     * DELETE FROM rooms WHERE id = room_id
+     */
+    const { room_id } = req.params;
+
+    if (!room_id) return res.status(400).json({ error: "Faltan datos" });
+    const message_query = 'DELETE FROM messages WHERE room_id = $1';
+    const room_members_query = 'DELETE FROM room_members WHERE room_id = $1';
+    const room_query = 'DELETE FROM rooms WHERE id = $1 RETURNING *';
+
+    try {
+        await db.query('BEGIN');
+
+        await db.query(message_query, [room_id])
+        await db.query(room_members_query, [room_id])
+        const result = await db.query(room_query, [room_id])
+
+        if (result.rowCount === 0) {
+            await db.query('ROLLBACK')
+            res.status(400).json({ message: 'Room not found' })
+        }
+
+        await db.query('COMMIT')
+        res.json({ message: 'Room deleted successfully' });
+        io.emit('delete-room', {room_id});
+    } catch (error) {
+        await db.query('ROLLBACK');
+        console.error('Error deleting room:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+export { addMemberToRoom, postRoom, getRoomByUser, deleteRoom }

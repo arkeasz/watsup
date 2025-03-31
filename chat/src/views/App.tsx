@@ -10,7 +10,6 @@ interface User {
 
 function App() {
   const navigate = useNavigate();
-  const [users, setUsers] = useState<User[]>([]);
   const [form ,setForm] = useState({username: '', email: '', password: ''});
 
   useEffect(() => {

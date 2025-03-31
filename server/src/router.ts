@@ -1,11 +1,9 @@
-import express, { type Request, type Response } from 'express';
+import { Router } from 'express';
 import { getUsers, postUser } from './handlers/user';
-import db from './config/db';
-import { io } from './config/app';
 import { getMessageByRoom, postMessageByRoom } from './handlers/message';
-import { addMemberToRoom, getRoomByUser, postRoom } from './handlers/room';
+import { addMemberToRoom, deleteRoom, getRoomByUser, postRoom } from './handlers/room';
 
-const router = express.Router();
+const router = Router();
 
 // route -> users
 router.get('/users', getUsers);
@@ -16,13 +14,11 @@ router.get('/messages/:room_id', getMessageByRoom);
 router.post('/message', postMessageByRoom);
 
 // route -> rooms
-router.post("/rooms/add", addMemberToRoom);
-router.post('/room', postRoom);
+// rooms
+router.post('/room/add', postRoom);
+router.delete('/room/delete/:room_id', deleteRoom)
+// rooms and users
 router.get('/rooms/:user_id', getRoomByUser);
-
-router.delete('/room/delete/:room_id', async (req: Request, res: Response) => {
-
-})
-
+router.post("/rooms/member/add", addMemberToRoom);
 
 export default router;

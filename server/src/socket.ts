@@ -1,11 +1,11 @@
 import { io } from "./config/app";
 
 io.on('connection', (socket) => {
-    console.log('a user connected');
     socket.onAny((event, ...args) => {
         console.log('📡 Evento recibido:', event, args);
-      });
-    socket.on('registerUser', (userId) => {
+    });
+
+    socket.on('registerUserOnRoom', (userId) => {
         socket.join(userId.toString());
         console.log(`Usuario ${userId} registrado en su room personal`);
     });

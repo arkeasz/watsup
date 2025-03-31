@@ -31,5 +31,4 @@ const postMessageByRoom = async (req: Request, res: Response): Promise<any> => {
     return res.json(newMessage);
 };
 
-
 export { getMessageByRoom, postMessageByRoom }
