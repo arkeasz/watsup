@@ -1,28 +1,34 @@
-import { JSX } from "react";
+import { JSX, useEffect, useState } from "react";
 import { Room } from "../types"
-import useChat from "../hooks/useChat";
-import { deleteRoom } from "../services/api";
 import './Room.css'
+import RoomContext from "./RoomContext";
 
-type Rooms = {
+type RoomsComponent = {
     createRoom: (e: React.FormEvent) => void;
     roomsAll: Room[];
     onRoom: (r: Room) => void;
-    setRoomsAll: React.Dispatch<React.SetStateAction<Room[]>>
 }
 
-const Rooms = ({ createRoom, roomsAll, onRoom, setRoomsAll }: Rooms): JSX.Element => {
+type Coords = {
+    x: number,
+    y: number
+}
 
-    const removeRoom = async (id: number) => {
-        try {
-            const res = await deleteRoom(id);
-            if (!res.ok) throw new Error("Failed to delete room");
+const Rooms = ({ createRoom, roomsAll, onRoom }: RoomsComponent): JSX.Element => {
+    const [ coords, setCoords ] = useState<Coords>({x:0, y:0})
+    const [ contextRoom, setContextRoom ] = useState<number | null>(null);
 
-            // setRoomsAll((prev) => prev.filter(ro => ro.id !== id));
-        } catch (error) {
-            console.error('Error deleting room', error);
-        }
-    }
+    const openCt = (e: React.MouseEvent<HTMLElement>, roomId: number) => {
+        e.preventDefault();
+        setContextRoom(roomId === contextRoom ? null : roomId);
+        setCoords({ x: e.pageX, y: e.pageY });
+    };
+
+    useEffect(() => {
+        const handleClickOutside = () => setContextRoom(null);
+        document.addEventListener("click", handleClickOutside);
+        return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
 
     return (
         <div className="rooms">
@@ -40,9 +46,17 @@ const Rooms = ({ createRoom, roomsAll, onRoom, setRoomsAll }: Rooms): JSX.Elemen
                         data-peer-id={r.id}
                         key={r.id}
                         className="room"
+                        onContextMenu={ (e) => openCt(e, r.id) }
                     >
-                        <div>{r.name}</div>
-                        <div className="delete" onClick={() => removeRoom(r.id)}>X</div>
+                        <div className="room__title">{r.name}</div>
+                        {
+                            contextRoom === r.id &&
+                            <RoomContext
+                                room={r}
+                                x={coords.x}
+                                y={coords.y}
+                            />
+                        }
                     </section>
                 ))}
             </div>

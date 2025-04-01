@@ -67,8 +67,8 @@ const postRoom = async (req: Request, res: Response): Promise<any> => {
         return;
     }
 
-    let room_query = 'INSERT INTO rooms (name) VALUES ($1) RETURNING *';
-    const { rows: roomRows } = await db.query(room_query, [name]);
+    let room_query = 'INSERT INTO rooms (name, created_by) VALUES ($1) RETURNING *';
+    const { rows: roomRows } = await db.query(room_query, [name, user_id]);
 
 
     if (roomRows.length == 0) return res.status(500).json({ error: 'Room creation failed' });
@@ -76,8 +76,8 @@ const postRoom = async (req: Request, res: Response): Promise<any> => {
     const newRoom = roomRows[0];
 
     // insert the creator of the room on room_members
-    const member_query = 'INSERT INTO room_members (room_id, user_id) VALUES ($1, $2)';
-    await db.query(member_query, [newRoom.id, user_id]);
+    const member_query = 'INSERT INTO room_members (room_id, user_id, is_owner) VALUES ($1, $2, $3)';
+    await db.query(member_query, [newRoom.id, user_id, true]);
 
     try {
         io.emit('new-room', newRoom);

@@ -123,13 +123,6 @@ header {
     overflow-y: auto;
 }
 
-.room {
-    background-color: #222;
-    width: calc(100% - 2rem);
-    padding: 1rem ;
-    cursor: pointer;
-}
-
 .room__hidden {
     visibility: hidden;
 }

@@ -32,7 +32,6 @@ function Chat() {
                 createRoom={createRoom}
                 roomsAll={roomsAll}
                 onRoom={onRoom}
-                setRoomsAll={setRoomsAll}
             />
             <ChatBox
                 room={room}

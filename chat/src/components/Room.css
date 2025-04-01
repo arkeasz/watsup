@@ -1,0 +1,17 @@
+.room {
+    background-color: #222;
+    width: calc(100% - 2rem);
+    padding: 1rem ;
+    cursor: pointer;
+    display: flex;
+}
+
+.room__title {
+
+}
+
+.room__context {
+    background-color: #fff;
+    width: 4rem;
+    height: 5rem;
+}

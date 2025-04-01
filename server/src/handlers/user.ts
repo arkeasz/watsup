@@ -25,6 +25,4 @@ const postUser = async (req: Request, res: Response): Promise<any> => {
     return res.json(rows[0]);
 }
 
-
-
 export { getUsers, postUser };
