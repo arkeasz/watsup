@@ -11,7 +11,25 @@
 }
 
 .room__context {
-    background-color: #fff;
-    width: 4rem;
+    display: flex;
+    flex-direction: column;
+    background-color: #F2EFE7;
+    border-radius: 5px;
+    width: 8rem;
+    gap:.2rem;
+    padding: .5rem;
+    color: #111;
     height: 5rem;
+}
+
+.room__context div {
+    background-color: #EEF1DA;
+    padding: .5rem 0;
+}
+
+.room__hidden-top  {
+    visibility: hidden;
+    height: .01rem;
+    padding: 0;
+    width: 0;
 }

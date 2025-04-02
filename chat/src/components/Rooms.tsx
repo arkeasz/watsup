@@ -1,4 +1,4 @@
-import { JSX, useEffect, useState } from "react";
+import { JSX, useEffect, useRef, useState } from "react";
 import { Room } from "../types"
 import './Room.css'
 import RoomContext from "./RoomContext";
@@ -7,6 +7,8 @@ type RoomsComponent = {
     createRoom: (e: React.FormEvent) => void;
     roomsAll: Room[];
     onRoom: (r: Room) => void;
+    openSettings: () => void;
+    setRoom: React.Dispatch<React.SetStateAction<Room | null>>;
 }
 
 type Coords = {
@@ -14,9 +16,19 @@ type Coords = {
     y: number
 }
 
-const Rooms = ({ createRoom, roomsAll, onRoom }: RoomsComponent): JSX.Element => {
+const Rooms = ({ createRoom, roomsAll, onRoom, openSettings, setRoom }: RoomsComponent): JSX.Element => {
     const [ coords, setCoords ] = useState<Coords>({x:0, y:0})
     const [ contextRoom, setContextRoom ] = useState<number | null>(null);
+    const roomsTop =  useRef<HTMLDivElement | null>(null);
+
+    const prevRoomsCount = useRef(roomsAll.length);
+
+    useEffect(() => {
+        if (roomsAll.length > prevRoomsCount.current) {
+            roomsTop.current?.scrollIntoView({ behavior: "smooth" });
+        }
+        prevRoomsCount.current = roomsAll.length;
+    }, [roomsAll.length]);
 
     const openCt = (e: React.MouseEvent<HTMLElement>, roomId: number) => {
         e.preventDefault();
@@ -38,7 +50,7 @@ const Rooms = ({ createRoom, roomsAll, onRoom }: RoomsComponent): JSX.Element =>
                     <button type="submit">Add</button>
                 </form>
             </div>
-            <div className="rooms_all">
+            <div className="rooms_all" >
                 <section className="room room__hidden">wazaaaa</section>
                 {roomsAll.map((r: Room) => (
                     <section
@@ -55,10 +67,13 @@ const Rooms = ({ createRoom, roomsAll, onRoom }: RoomsComponent): JSX.Element =>
                                 room={r}
                                 x={coords.x}
                                 y={coords.y}
-                            />
-                        }
+                                openSettings={openSettings}
+                                setRoom={setRoom}
+                                />
+                            }
                     </section>
                 ))}
+                <section className="room room__hidden-top" ref={roomsTop}>wazaaaa</section>
             </div>
         </div>
     )

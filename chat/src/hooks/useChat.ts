@@ -192,6 +192,7 @@ function useChat() {
         id,
         messageInput,
         msg,
+        setRoom,
         setRoomsAll,
         logOut,
         openSettings,

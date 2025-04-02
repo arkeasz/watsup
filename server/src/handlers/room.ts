@@ -25,15 +25,19 @@ const addMemberToRoom = async (req: Request, res: Response): Promise<any> => {
             return res.status(400).json({ error: "El usuario ya está en la sala" });
         }
 
-        const roomRes = await db.query("SELECT name FROM rooms WHERE id = $1", [room_id]);
+        const roomRes = await db.query("SELECT name, created_by FROM rooms WHERE id = $1", [room_id]);
         if (roomRes.rowCount === 0) {
             return res.status(404).json({ error: "Sala no encontrada" });
         }
-        const room_name = roomRes.rows[0].name;
+
+        const { name: room_name, created_by } = roomRes.rows[0];
+
+        // Determinar si el usuario agregado es el dueño
+        const is_owner = user_id === created_by;
 
         await db.query(
-            "INSERT INTO room_members (user_id, room_id) VALUES ($1, $2)",
-            [user_id, room_id]
+            "INSERT INTO room_members (user_id, room_id, is_owner) VALUES ($1, $2, $3)",
+            [user_id, room_id, is_owner]
         );
 
         io.to(user_id.toString()).emit('youWereAddedToRoom', {
@@ -45,7 +49,8 @@ const addMemberToRoom = async (req: Request, res: Response): Promise<any> => {
             user_id,
             username,
             room_id,
-            room_name
+            room_name,
+            is_owner
         });
 
         return res.status(201).json({
@@ -57,7 +62,7 @@ const addMemberToRoom = async (req: Request, res: Response): Promise<any> => {
         console.error("Error al agregar usuario:", error);
         return res.status(500).json({ error: "Error interno del servidor" });
     }
-}
+};
 
 const postRoom = async (req: Request, res: Response): Promise<any> => {
     const { name, user_id } = req.body;
@@ -67,7 +72,7 @@ const postRoom = async (req: Request, res: Response): Promise<any> => {
         return;
     }
 
-    let room_query = 'INSERT INTO rooms (name, created_by) VALUES ($1) RETURNING *';
+    let room_query = 'INSERT INTO rooms (name, created_by) VALUES ($1, $2) RETURNING *';
     const { rows: roomRows } = await db.query(room_query, [name, user_id]);
 
 
@@ -110,11 +115,13 @@ const getRoomByUser = async (req: Request, res: Response): Promise<any> => {
 
 const deleteRoom = async (req: Request, res: Response): Promise<any> => {
     /**
-     * firs step: delete the room
+     * firs step: delete the messages
+     * DELETE FROM messages WHERE room_id = room_id
+     * second step: delete the room
      * DELETE FROM room_members WHERE room_id = room_id
-     * second step: delte room_members
+     * third step: delte room_members
      * DELETE FROM rooms WHERE id = room_id
-     */
+    **/
     const { room_id } = req.params;
 
     if (!room_id) return res.status(400).json({ error: "Faltan datos" });

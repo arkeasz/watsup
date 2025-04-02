@@ -13,6 +13,7 @@ function Chat() {
         id,
         messageInput,
         msg,
+        setRoom,
         logOut,
         openSettings,
         createRoom,
@@ -32,6 +33,8 @@ function Chat() {
                 createRoom={createRoom}
                 roomsAll={roomsAll}
                 onRoom={onRoom}
+                openSettings={openSettings}
+                setRoom={setRoom}
             />
             <ChatBox
                 room={room}
